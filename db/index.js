@@ -22,9 +22,11 @@ const seed = () => {
 
 //exports
 module.exports = {
-  Order,
-  Product,
-  LineItem,
+  models: {
+    Order,
+    Product,
+    LineItem,
+  },
   sync,
   seed
 }

@@ -10,12 +10,7 @@
 <body>
 <div class="container">
   <h1>Acme, the Cart Version!</h1>
-  <!-- tab nav -->
-  <ul class="nav nav-tabs" id="mytabs">
-    <li role="presentation" {% if nav === 'home' %} class="active" {% endif %}> <a href='/'>Home</a></li>
-    <li role="presentation" {% if nav === 'users' %} class="active" {% endif %} ><a href='/users'>Users ({{ count }})</a></li>
-  </ul>
-  <div>
+<div>
   {% block content %}
     Whoops! Something Didn't Load Properly
   {% endblock %}

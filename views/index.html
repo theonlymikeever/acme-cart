@@ -2,23 +2,32 @@
 
 {% block content %}
 <div class="well">
+    <!-- error block -->
+    {% if error %}
+    <div class='container'>
+      <div class="alert alert-danger">
+        <strong>Error:</strong> {{ error }}<br>
+      </div>
+    </div>
+    {% endif %}
+    <!-- welcome -->
    <h3>Welcome to index</h3>
    <p>This project is a demonstration of Sequelize model association through a Postgres DB. Model relationship is as follows:</p>
    <p><code>LineItem.belongsTo(Order);</code></p>
    <p><code>LineItem.belongsTo(Product);</code></p>
    <p><code>Order.hasMany(LineItem, {as: 'item'});</code></p>
    <hr>
-   <p><em>Here's what's currently in your database:</em></p>
+   <p><em>Here's what's currently in your stock:</em></p>
   <p><strong>Products</strong></p>
-  <ul>
-      {% for prod in block.products %}
-      <li>
-          {{ prod.name }}
-      </li>
-      {% endfor %}
+  <ul class="list-group">
+    {% for prod in block.products %}
+    <li class="list-group-item">
+      <form action="/orders/{{ prod.id }}/lineItems" method="POST">{{ prod.name }}<button class="btn btn-primary pull-right">Add to Cart</button><input type="hidden" value="{{ prod.id }}" name="productId"></form>
+    </li>
+    {% endfor %}
   </ul>
   <p><strong>Orders</strong></p>
-  <ul>
+<!--   <ul>
       {% for order in block.orders %}
       <li>
           {{ order.id }}<br>
@@ -38,7 +47,8 @@
       </li>
       {% endfor %}
   </ul>
- </div>
+ --> </div>
+{% endblock %}
 <!-- <div class="well">
        <form action="/users" method="post">
     <div class="form-group">
@@ -47,5 +57,5 @@
     <button class="btn btn-primary btn-xs">Add User</button>
   </form>
 </div>
+
  -->
-{% endblock %}

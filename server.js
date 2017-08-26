@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const path = require('path');
 const Models = require('./db');
-const {Order, Product, LineItem } = Models;
+const {Order, Product, LineItem } = Models.models;
 
 //instance and config
 const app = express();
@@ -35,6 +35,9 @@ app.get('/', (req, res, next) => {
     .catch(next)
 })
 
+//all other routes
+app.use('/orders', require('./routes/orders'))
+
 //error handling
 app.get('/', (err, req, res, next) => {
   console.error(err);
@@ -49,20 +52,20 @@ Models.sync()
   })// ****** testing association
   .then(() => {
     return Promise.all([
-          Order.create({address:'world'}),
+          Order.create({isCart: true, address:'world'}),
           LineItem.create({quantity:1}),
           Product.findOne({where: {name: 'iPod Mini'}})
         ])
   })
   .then(([_order, _lineitem, _prod]) => {
-     _lineitem.setProduct(_prod);
-     _lineitem.setOrder(_order);
-     _order.addLineItem(_lineitem)
-     return _order
+     return Promise.all([
+       _lineitem.setProduct(_prod),
+       // _lineitem.setOrder(_order),
+       _order.addLineItem(_lineitem)
+     ])
   })
   // ****** end testing
-  .then((res) => {
-    console.log(res)
+  .then(() => {
     app.listen(3001, () => {
       console.log('listening on port 3001');
     })
