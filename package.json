@@ -1,0 +1,32 @@
+{
+  "name": "acme-cart",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "DATABASE_URL=postgres://localhost/acme_cart node server.js",
+    "start:dev": "DATABASE_URL=postgres://localhost/acme_cart nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theonlymikeever/acme-cart.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/theonlymikeever/acme-cart/issues"
+  },
+  "homepage": "https://github.com/theonlymikeever/acme-cart#readme",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.4",
+    "method-override": "^2.3.9",
+    "morgan": "^1.8.2",
+    "nunjucks": "^3.0.1",
+    "pg": "^7.2.0",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^4.7.5"
+  }
+}

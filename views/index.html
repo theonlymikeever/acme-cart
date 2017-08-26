@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="well">
+   <h3>Welcome to index</h3>
+   <p>This project is a demonstration of Sequelize model association through a Postgres DB. Model relationship is as follows:</p>
+   <p><code>Awards.belongsTo(User, {as: 'user'});</code></p>
+   <p><code>User.hasMany(Awards);</code></p>
+   <p><code>User.belongsTo(User, { as: 'mentor'});</code></p>
+   <p><code>User.hasMany(User, { as: 'mentorees', foreignKey: 'mentorId'});</code></p>
+   <hr>
+   <p>Here's the users currently in your database:</p>
+  <ul>
+      <!-- PLACEHOLDER LIST OF PAGES -->
+      {% for user in users %}
+      <li>
+          {{ user.name }}
+      </li>
+      {% endfor %}
+  </ul>
+ </div>
+<div class="well">
+       <form action="/users" method="post">
+    <div class="form-group">
+      <input class="form-control" name="name" placeholder="name">
+    </div>
+    <button class="btn btn-primary btn-xs">Add User</button>
+  </form>
+</div>
+
+{% endblock %}
