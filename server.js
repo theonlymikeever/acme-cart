@@ -16,39 +16,57 @@ app.engine('html', nunjucks.render);
 
 //middleware and static routes
 app.use(morgan('dev'));
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use('/vendor', express.static(path.join(__dirname, 'node_modules')));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
+//Main get route
 app.get('/', (req, res, next) => {
-  res.send('hello world')
+  Promise.all([
+    Order.findAll(),
+    Product.findAll(),
+    LineItem.findAll()
+    ]) //most of this is for testing to show the data
+    .then(([orders,products,lineitems]) => {
+      let block = {orders, products, lineitems}
+      res.render('index', {block})
+    })
+    .catch(next)
 })
 
-let order;
+//error handling
+app.get('/', (err, req, res, next) => {
+  console.error(err);
+  res.status(err.status || 500).send(err.message);
+})
+
+let newOrder;
 //temp
 Models.sync()
   .then(() => {
     return Models.seed();
-  })// testing association
+  })// ****** testing association
   .then(() => {
-    return Order.create({isCart: true, address: 'here'})
+    return Promise.all([
+          Order.create({address:'world'}),
+          LineItem.create({quantity:1}),
+          Product.findOne({where: {name: 'iPod Mini'}})
+        ])
   })
-  .then((createdOrder) => {
-    order = createdOrder;
-    return Product.findOne({
-      where: {
-        name: "iPod"
-      }
-    })
+  .then(([_order, _lineitem, _prod]) => {
+     _lineitem.setProduct(_prod);
+     _lineitem.setOrder(_order);
+     _order.addLineItem(_lineitem)
+     return _order
   })
-  .then((found) => {
-    return order.addItem(found)
-  })
-  .then(() => {
-    return Order.findAll({indclude:[{model:LineItem, as: 'items'}]})
-  })
-  .then((found) => {
-    console.log(found)
-  })
-  .then(() => {
+  // ****** end testing
+  .then((res) => {
+    console.log(res)
     app.listen(3001, () => {
       console.log('listening on port 3001');
     })
+  })
+  .catch((err) => {
+    console.log(err.message)
   })

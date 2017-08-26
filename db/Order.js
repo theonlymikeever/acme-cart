@@ -13,5 +13,31 @@ const Order = db.define('order', {
   }
 })
 
+//hooks
+Order.hook('afterCreate', function(order) {
+  order.setDataValue({isCart: true});
+})
+
+//class methods
+Order.updateFromRequestBody = function(id, body) {
+  return Order.findOne({
+    where: {
+      id: id
+    }
+  })
+  .then((foundOrder) => {
+    return foundOrder.update
+  })
+}
+
+
+//instance methods
+Order.prototype.addProductToCart = function() {
+
+}
+
+Order.prototype.destroyLineItem = function() {
+
+}
 
 module.exports = Order;

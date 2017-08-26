@@ -4,22 +4,42 @@
 <div class="well">
    <h3>Welcome to index</h3>
    <p>This project is a demonstration of Sequelize model association through a Postgres DB. Model relationship is as follows:</p>
-   <p><code>Awards.belongsTo(User, {as: 'user'});</code></p>
-   <p><code>User.hasMany(Awards);</code></p>
-   <p><code>User.belongsTo(User, { as: 'mentor'});</code></p>
-   <p><code>User.hasMany(User, { as: 'mentorees', foreignKey: 'mentorId'});</code></p>
+   <p><code>LineItem.belongsTo(Order);</code></p>
+   <p><code>LineItem.belongsTo(Product);</code></p>
+   <p><code>Order.hasMany(LineItem, {as: 'item'});</code></p>
    <hr>
-   <p>Here's the users currently in your database:</p>
+   <p><em>Here's what's currently in your database:</em></p>
+  <p><strong>Products</strong></p>
   <ul>
-      <!-- PLACEHOLDER LIST OF PAGES -->
-      {% for user in users %}
+      {% for prod in block.products %}
       <li>
-          {{ user.name }}
+          {{ prod.name }}
+      </li>
+      {% endfor %}
+  </ul>
+  <p><strong>Orders</strong></p>
+  <ul>
+      {% for order in block.orders %}
+      <li>
+          {{ order.id }}<br>
+          {{ order.isCart }}<br>
+          {{ order.address }}<br>
+      </li>
+      {% endfor %}
+  </ul>
+  <p><strong>LineItems</strong></p>
+  <ul>
+      {% for item in block.lineitems %}
+      <li>
+          id: {{ item.id }}<br>
+          quantity: {{ item.quantity }}<br>
+          orderId: {{ item.orderId }}<br>
+         productId: {{ item.productId }}<br>
       </li>
       {% endfor %}
   </ul>
  </div>
-<div class="well">
+<!-- <div class="well">
        <form action="/users" method="post">
     <div class="form-group">
       <input class="form-control" name="name" placeholder="name">
@@ -27,5 +47,5 @@
     <button class="btn btn-primary btn-xs">Add User</button>
   </form>
 </div>
-
+ -->
 {% endblock %}
