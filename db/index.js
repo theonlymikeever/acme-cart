@@ -8,7 +8,6 @@ const LineItem = require('./LineItem');
 
 LineItem.belongsTo(Order);
 LineItem.belongsTo(Product);
-// Order.hasMany(LineItem, {as: 'items'});
 Order.hasMany(LineItem);
 
 //sync and seed functions
