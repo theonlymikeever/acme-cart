@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="well">
+<div class="col-xs-12 col-sm-8">
     <!-- error block -->
     {% if error %}
     <div class='container'>
@@ -11,51 +11,60 @@
     </div>
     {% endif %}
     <!-- welcome -->
-   <h3>Welcome to index</h3>
    <p>This project is a demonstration of Sequelize model association through a Postgres DB. Model relationship is as follows:</p>
    <p><code>LineItem.belongsTo(Order);</code></p>
    <p><code>LineItem.belongsTo(Product);</code></p>
    <p><code>Order.hasMany(LineItem, {as: 'item'});</code></p>
    <hr>
+  <h3>Products</h3>
    <p><em>Here's what's currently in your stock:</em></p>
-  <p><strong>Products</strong></p>
   <ul class="list-group">
-    {% for prod in block.products %}
+    {% for prod in viewModel.products %}
     <li class="list-group-item">
       <form action="/orders/{{ prod.id }}/lineItems" method="POST">{{ prod.name }}<button class="btn btn-primary pull-right">Add to Cart</button><input type="hidden" value="{{ prod.id }}" name="productId"></form>
     </li>
     {% endfor %}
   </ul>
-  <p><strong>Orders</strong></p>
-<!--   <ul>
-      {% for order in block.orders %}
-      <li>
-          {{ order.id }}<br>
-          {{ order.isCart }}<br>
-          {{ order.address }}<br>
-      </li>
+  </div>
+<!-- Right side -->
+{% if (viewModel.lineItems) or (viewModel.pastOrders) %}
+<div class="col-xs-12 col-sm-4">
+  {% if viewModel.lineItems.length > 0 %}
+<!-- Cart -->
+  <div>
+    <h3>Your Cart</h3>
+    <div class="well">
+    {% for line in viewModel.lineItems %}
+      <li class="list-group-item">{{ line.product.name }}<span class="label label-default pull-right">{{ line.quantity }}</span><form action="/orders/{{ viewModel.cart.id }}/lineItems/{{ line.id }}?_method=DELETE" method="POST"><button class="btn btn-warning">Remove From Cart</button></form></li>
       {% endfor %}
-  </ul>
-  <p><strong>LineItems</strong></p>
-  <ul>
-      {% for item in block.lineitems %}
-      <li>
-          id: {{ item.id }}<br>
-          quantity: {{ item.quantity }}<br>
-          orderId: {{ item.orderId }}<br>
-         productId: {{ item.productId }}<br>
-      </li>
-      {% endfor %}
-  </ul>
- --> </div>
-{% endblock %}
-<!-- <div class="well">
-       <form action="/users" method="post">
-    <div class="form-group">
-      <input class="form-control" name="name" placeholder="name">
+      <hr>
+        <form action="/orders/{{ viewModel.cart.id }}?_method=PUT" method="POST"><input type="hidden" name="isCart" value="false">
+        <hr>
+        <div class="form-group"><label>Address</label><input class="form-control" name="address">
+        </div><button class="btn btn-primary">Place Order</button></form>
     </div>
-    <button class="btn btn-primary btn-xs">Add User</button>
-  </form>
+  </div>
+  {% endif %}
+<!-- Past Orders -->
+  {% if viewModel.pastOrders.length > 0 %}
+  <div>
+  <h3>Your Orders</h3>
+  <ul class="list-group">
+  {% for order in viewModel.pastOrders %}
+    <li class="list-group-item"><strong>Order:</strong> {{ order.address }}
+      <ul class="list-group">
+        {% for line in order.lineItems %}
+        <li class="list-group-item">{{ line.product.name }}<span class="label label-default pull-right">1</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </li>
+    {% endfor %}
+  </ul>
+  </div>
+  {% endif %}
 </div>
+{% endif %}
 
- -->
+ </div>
+{% endblock %}

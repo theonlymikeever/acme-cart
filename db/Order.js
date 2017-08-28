@@ -10,93 +10,148 @@ const Order = db.define('order', {
   },
   address: {
     type: Sequelize.STRING,
-    // allowNull: false
+    AllowNull: false,
+    validate: {
+      notEmpty: true
+    }
   }
 })
 
 //class methods
 Order.updateFromRequestBody = function(id, body) {
-  return Order.findOrCreate({
-    where: {isCart: true},
-    defaults: { isCart: true, address: body.address }
-  })
-  .spread((user, created) => {
-    console.log(user.get())
-    console.log(created)
-  })
-  // .then((order) => {
-    // return order.update
-  // })
-  .catch(console.log)
+  //completing an order
+  return Order.getCart()
+      .then((cart) => {
+        return cart.update({
+          isCart: body.isCart,
+          address: body.address
+        })
+      })
+      .catch((err) => {
+        if (err.message === 'Validation error: Validation notEmpty on address failed'){
+          console.log('eifjo')
+         throw new Error("address required")
+        }
+      })
 }
 
 Order.addProductToCart = function(productId) {
-  // let currentOrder = Order.findOrCreate({
-  //     where: { isCart: true },
-  //     defaults: { isCart: true }
-  //   })
-  //   .spread((order, created) => {
-  //     // console.log(order.get())
-  //     // console.log('***')
-  //     console.log(created)
-  //     return order
-  //   })
+  return Order.addLineItem(productId)
+          .then((lineItem) => {
+            //if addLineItem returns a brand new lineItem
+            //or a brand new instance of a cart
+            //otherwise it will inrcrement and we skip this if
+            if (lineItem.quantity === 1 || !lineItem){
+              let cart = Order.getCart()
+              let addedProduct =  Product.findOne({
+                where: { id: productId }
+               })
 
-  let currentOrder = Order.findAll({
-      where: {isCart: true },
-      include: [{ model: LineItem }]
-      })
-
-  let currentLineItem = LineItem.findOrCreate({
-      where: { productId: productId },
-      defaults: { quantity: 1 }
-      })
-      .spread((line, created) => {
-        // console.log(line.get());
-        console.log(created)
-        return line
-      })
-
-  let addedProduct =  Product.findOne({
-      where: { id: productId }
-     })
-
-  return Promise.all([
-      currentOrder,
-      currentLineItem,
-      addedProduct
-    ])
-  .then(([_order, _lineitem, _product]) => {
-    console.log(_order)
-    //instance of a cart
-    return Promise.all([
-      _lineitem.setProduct(_product),
-      _order.addLineItem(_lineitem)
-    ])
-  })
-  .catch((err) => {
-    console.log('there was...and error')
-    console.log(err)
-  })
+              return Promise.all([
+                      cart,
+                      addedProduct
+                    ])
+                    .then(([_cart, _prod]) => {
+                      console.log('grabbing cart and adding product')
+                      return Promise.all([
+                        lineItem.setProduct(_prod),
+                        lineItem.setOrder(_cart)
+                      ])
+                    })
+            }
+          })
+          .catch((err) => {
+            console.log(err)
+          })
 }
 
-Order.destroyLineItem = function(orderId, itemId) {
-  return Order.findOne({
+Order.destroyLineItem = function(orderId, id) {
+  return LineItem.findOne({
     where: {
-      id: orderId
+      orderId: orderId,
+      id: id
     }
   })
-  .then((foundOrder) => {
-    return foundOrder.getLineItem({
-      where: {
-        id: itemId
-      }
-    })
-  })
   .then((foundItem) => {
-    return LineItem.destroy(foundItem)
+    console.log('deleting line item... ')
+    return foundItem.destroy()
   })
   .catch(console.log)
+}
+
+Order.getCart = function() {
+  //this funciton looks for an open cart or creates it
+  //returns a promise
+  return Order.findOne({
+      where: { isCart: true },
+      include: [
+        { model: LineItem, include: [
+          {model: Product }]
+        }]
+    })
+    .then((cart) => {
+      if (cart){
+        // console.log(cart)
+        //found open cart, return
+        return cart
+      } else {
+        //no open cart exists, return new instance
+        console.log('no cart have to create... ')
+        return Order.create({ isCart: true })
+      }
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+}
+
+Order.addLineItem = function(prodId) {
+  //this function grabs an open cart and
+  //then looks for the lineitem in existence (or creates)
+  //returns a promise
+  return Order.getCart()
+        .then((cart) => {
+          //getCart returns new cart which has no items
+          if (!cart.lineItems) return
+
+          //getCart returns current cart, now looking
+          //through line items
+          return cart.lineItems.filter(function(item) {
+            if (item.productId === prodId) {
+              return item
+            }
+          })[0]
+        })
+        .then((results) => {
+          if (!results) {
+            //line item doesn't exist, must create
+            console.log('line item doesnt exist, creating')
+            return LineItem.create({ quantity: 1 })
+          } else {
+            //line item exists, increment
+          }
+          console.log('line item exists, incrementing')
+          return results.increment('quantity', {by: 1})
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+}
+
+Order.getPastOrders = function() {
+  //this funciton looks for all previous carts
+  //and includes the order details
+  //returns a promise
+  return Order.findAll({
+      where: { isCart: false },
+      include: [
+        { model: LineItem, include: [
+          {model: Product }]
+        }]
+    })
+    .catch((err) => {
+      console.log(err)
+    })
 }
 
 module.exports = Order;

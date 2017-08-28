@@ -20,23 +20,26 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use('/vendor', express.static(path.join(__dirname, 'node_modules')));
 app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use(methodOverride('_method'));
 
 //Main get route
 app.get('/', (req, res, next) => {
-  Promise.all([
-    Order.findAll(),
-    Product.findAll(),
-    LineItem.findAll()
-    ]) //most of this is for testing to show the data
-    .then(([orders,products,lineitems]) => {
-      let block = {orders, products, lineitems}
-      res.render('index', {block})
+    Promise.all([
+       Order.getCart(),
+       Product.findAll(),
+       Order.getPastOrders()
+    ])
+    .then(([cart, products, pastOrders]) => {
+      console.log(pastOrders)
+      let viewModel = {cart, lineItems: cart.lineItems, products, pastOrders}
+      res.render('index', {viewModel})
     })
     .catch(next)
 })
 
+
 //all other routes
-app.use('/orders', require('./routes/orders'))
+app.use('/orders', require('./routes/orders'));
 
 //error handling
 app.get('/', (err, req, res, next) => {
@@ -44,7 +47,6 @@ app.get('/', (err, req, res, next) => {
   res.status(err.status || 500).send(err.message);
 })
 
-let newOrder;
 //temp
 Models.sync()
   .then(() => {
@@ -60,8 +62,8 @@ Models.sync()
   .then(([_order, _lineitem, _prod]) => {
      return Promise.all([
        _lineitem.setProduct(_prod),
-       // _lineitem.setOrder(_order),
-       _order.addLineItem(_lineitem)
+       _lineitem.setOrder(_order),
+       // _order.addLineItem(_lineitem)
      ])
   })
   // ****** end testing
