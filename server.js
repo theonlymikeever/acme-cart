@@ -53,21 +53,6 @@ Models.sync()
     return Models.seed();
   })// ****** testing association
   .then(() => {
-    return Promise.all([
-          Order.create({isCart: true, address:'world'}),
-          LineItem.create({quantity:1}),
-          Product.findOne({where: {name: 'iPod Mini'}})
-        ])
-  })
-  .then(([_order, _lineitem, _prod]) => {
-     return Promise.all([
-       _lineitem.setProduct(_prod),
-       _lineitem.setOrder(_order),
-       // _order.addLineItem(_lineitem)
-     ])
-  })
-  // ****** end testing
-  .then(() => {
     app.listen(3001, () => {
       console.log('listening on port 3001');
     })

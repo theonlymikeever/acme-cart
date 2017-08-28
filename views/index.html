@@ -10,12 +10,8 @@
       </div>
     </div>
     {% endif %}
-    <!-- welcome -->
-   <p>This project is a demonstration of Sequelize model association through a Postgres DB. Model relationship is as follows:</p>
-   <p><code>LineItem.belongsTo(Order);</code></p>
-   <p><code>LineItem.belongsTo(Product);</code></p>
-   <p><code>Order.hasMany(LineItem, {as: 'item'});</code></p>
-   <hr>
+<!-- Left side -->
+<!-- Product List -->
   <h3>Products</h3>
    <p><em>Here's what's currently in your stock:</em></p>
   <ul class="list-group">
@@ -25,7 +21,15 @@
     </li>
     {% endfor %}
   </ul>
+<!-- Welcome text -->
+  <div class="well">
+    <p>This project is a demonstration of Sequelize model association through a Postgres DB. Model relationship is as follows:</p>
+    <p><code>LineItem.belongsTo(Order);</code></p>
+    <p><code>LineItem.belongsTo(Product);</code></p>
+    <p><code>Order.hasMany(LineItem, {as: 'item'});</code></p>
   </div>
+</div>
+<!-- end left -->
 <!-- Right side -->
 {% if (viewModel.lineItems) or (viewModel.pastOrders) %}
 <div class="col-xs-12 col-sm-4">
