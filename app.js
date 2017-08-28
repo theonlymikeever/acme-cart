@@ -47,16 +47,5 @@ app.get('/', (err, req, res, next) => {
   res.status(err.status || 500).send(err.message);
 })
 
-//temp
-Models.sync()
-  .then(() => {
-    return Models.seed();
-  })// ****** testing association
-  .then(() => {
-    app.listen(3001, () => {
-      console.log('listening on port 3001');
-    })
-  })
-  .catch((err) => {
-    console.log(err.message)
-  })
+//app export
+module.exports = app;
