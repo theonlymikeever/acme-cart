@@ -29,7 +29,6 @@ Order.updateFromRequestBody = function(id, body) {
       })
       .catch((err) => {
         if (err.message === 'Validation error: Validation notEmpty on address failed'){
-          console.log('eifjo')
          throw new Error("address required")
         }
       })
@@ -60,9 +59,6 @@ Order.addProductToCart = function(productId) {
                     })
             }
           })
-          .catch((err) => {
-            console.log(err)
-          })
 }
 
 Order.destroyLineItem = function(orderId, id) {
@@ -76,7 +72,6 @@ Order.destroyLineItem = function(orderId, id) {
     console.log('deleting line item... ')
     return foundItem.destroy()
   })
-  .catch(console.log)
 }
 
 Order.getCart = function() {
@@ -99,9 +94,6 @@ Order.getCart = function() {
         console.log('no cart have to create... ')
         return Order.create({ isCart: true })
       }
-    })
-    .catch((err) => {
-      console.log(err)
     })
 }
 
@@ -133,9 +125,6 @@ Order.addLineItem = function(prodId) {
           console.log('line item exists, incrementing')
           return results.increment('quantity', {by: 1})
         })
-        .catch((err) => {
-          console.log(err)
-        })
 }
 
 Order.getPastOrders = function() {
@@ -145,13 +134,26 @@ Order.getPastOrders = function() {
   return Order.findAll({
       where: { isCart: false },
       include: [
-        { model: LineItem, include: [
-          {model: Product }]
+        { model: LineItem,
+          include: [
+            { model: Product }],
+          order: [ 'id', 'DESC']
         }]
     })
-    .catch((err) => {
-      console.log(err)
-    })
+}
+
+Order.getViewModel = function() {
+  //produces a view model will all pieces
+  //returns a promise
+  return Promise.all([
+       Order.getCart(),
+       Product.findAll(),
+       Order.getPastOrders()
+    ])
+  .then(([cart, products, pastOrders]) => {
+    let viewModel = {cart, lineItems: cart.lineItems, products, pastOrders}
+    return viewModel
+  })
 }
 
 module.exports = Order;

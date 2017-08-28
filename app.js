@@ -24,19 +24,12 @@ app.use(methodOverride('_method'));
 
 //Main get route
 app.get('/', (req, res, next) => {
-    Promise.all([
-       Order.getCart(),
-       Product.findAll(),
-       Order.getPastOrders()
-    ])
-    .then(([cart, products, pastOrders]) => {
-      console.log(pastOrders)
-      let viewModel = {cart, lineItems: cart.lineItems, products, pastOrders}
-      res.render('index', {viewModel})
+     Order.getViewModel()
+    .then((viewModel) => {
+      res.render('index', { viewModel })
     })
     .catch(next)
 })
-
 
 //all other routes
 app.use('/orders', require('./routes/orders'));

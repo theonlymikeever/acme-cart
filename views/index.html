@@ -2,14 +2,6 @@
 
 {% block content %}
 <div class="col-xs-12 col-sm-8">
-    <!-- error block -->
-    {% if error %}
-    <div class='container'>
-      <div class="alert alert-danger">
-        <strong>Error:</strong> {{ error }}<br>
-      </div>
-    </div>
-    {% endif %}
 <!-- Left side -->
 <!-- Product List -->
   <h3>Products</h3>
@@ -31,8 +23,15 @@
 </div>
 <!-- end left -->
 <!-- Right side -->
-{% if (viewModel.lineItems) or (viewModel.pastOrders) %}
 <div class="col-xs-12 col-sm-4">
+  <!-- error block -->
+    {% if viewModel.error %}
+      <div class="alert alert-danger">
+        <strong>Error:</strong> {{ viewModel.error }}<br>
+      </div>
+    {% endif %}
+  <!-- end error block -->
+{% if (viewModel.lineItems) or (viewModel.pastOrders) %}
   {% if viewModel.lineItems.length > 0 %}
 <!-- Cart -->
   <div>
@@ -67,8 +66,8 @@
   </ul>
   </div>
   {% endif %}
-</div>
 {% endif %}
+</div>
 
  </div>
 {% endblock %}
