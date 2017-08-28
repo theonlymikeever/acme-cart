@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const path = require('path');
 const Models = require('./db');
-const {Order, Product, LineItem } = Models.models;
+const {Order, Product } = Models.models;
 
 //instance and config
 const app = express();

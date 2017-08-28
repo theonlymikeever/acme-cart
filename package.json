@@ -6,7 +6,6 @@
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "DATABASE_URL=postgres://localhost/acme_cart node index.js",
     "start:dev": "DATABASE_URL=postgres://localhost/acme_cart nodemon index.js"
   },
   "repository": {
