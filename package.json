@@ -22,7 +22,7 @@
   "dependencies": {
     "ave": "0.0.1-0",
     "body-parser": "^1.17.2",
-    "bootstrap": "^3.3.7",
+    "bootstrap": "^3.4.1",
     "express": "^4.15.4",
     "method-override": "^2.3.9",
     "morgan": "^1.8.2",
